@@ -7,7 +7,7 @@ const convSid = process.env.CREATED_CONVERSATION_SID;   // CREATED_CONVERSATION_
 const client = require('twilio')(accountSid, authToken);
 
 loadMessagesFor = async (conversationSid, msgLimit = 20) => {
-  console.log("Fetching up to 20 messages for conversation", conversationSid);
+  console.log(`Fetching up to ${msgLimit} messages for conversation`, conversationSid);
   await client.conversations.conversations(conversationSid)
         .messages
         .list({msgLimit})
