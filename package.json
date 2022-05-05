@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/andy-shearer/mood#readme",
   "dependencies": {
+    "@twilio/conversations": "^2.1.0",
     "dotenv": "^16.0.0",
     "twilio": "^3.76.1"
   }

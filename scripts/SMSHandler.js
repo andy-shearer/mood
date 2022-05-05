@@ -1,28 +1,82 @@
 require("dotenv").config();
-const accountSid = process.env.TWILIO_ACCOUNT_SID;
+const { Client } = require('@twilio/conversations');
 const authToken = process.env.TWILIO_AUTH_TOKEN;
-const client = require('twilio')(accountSid, authToken);
+const senderNo = process.env.SENDER_NUMBER;
 
-async function loadMessagesFor(conversationSid, msgLimit = 20) {
-  console.log(`Fetching up to ${msgLimit} messages for conversation`, conversationSid);
-  await client.conversations.conversations(conversationSid)
-        .messages
-        .list({msgLimit})
-        .then(messages => messages.forEach(m => console.log("Message SID:", m.sid, "Message Body:", m.body)));
+async function loadMessages(conversationSid, msgLimit = 30) {
+  const client = new Client(authToken);
+  client.on('stateChanged', (state) => async {
+    if (state === 'initialized') {
+      const conv = await client.getConversationBySid(conversationSid);
+      console.log("Printing all messages in the conversation...");
+      const messages = await conv.getMessages(msgLimit);
+      messages.items.forEach(msg => console.log(msg));
+      //TODO Handle pagination
+    }
+  }
 }
 
-async function sendMessage(conversationSid, message) {
-  await client.conversations.conversations(conversationSid)
-        .messages
-        .create({author: 'moodBot', body: message})
-        .then(message => console.debug("Sent a new message with SID", message.sid));
+async function sendMessage(recipient, message, conversationSid) {
+  const conversation = await getConversation(recipient, conversationSid);
+  await validateParticipant(conversation, recipient);
+  const msgSid = await conversation.sendMessage(
+    message,
+    {
+      author: 'moodHQ'
+    }
+  );
+
+  console.debug("Sent a new message with index", msgSid);
+}
+
+async function getConversation(recipient, convSid) {
+  const client = new Client(token);
+  client.on('stateChanged', (state) => {
+    if (state === 'initialized') {
+        if (convSid) {
+          const conv = await client.getConversationBySid(convSid);
+          return conv;
+        } else {
+          const conversation = await client.createConversation({
+              uniqueName: `conv_${new Date().getTime()}`,
+              friendlyName: `Conversation with ${recipient}`,
+              attributes: {
+                user: recipient
+              }
+            });
+          return conversation;
+        }
+    }
+  }
+}
+
+async function validateParticipant(conv, recipient) {
+  const participants = await conv.getParticipants();
+
+  for(let i=0; i<participants.length; i++) {
+    console.debug("Conversation participant", i, participants[i]);
+    if(participants[i].attributes.user === recipient) {
+      return;
+    }
+  }
+
+  // Add the participant to the conversation
+  const response = await conv.addNonChatParticipant(
+    senderNo,
+    recipient,
+    {
+      user: recipient
+    }
+  );
+
+  console.log("ParticipantResponse for newly created conversation participant", response);
 }
 
 const SMSHandlerModule = {
-  loadMessagesFor,
+  loadMessages,
   sendMessage
 }
 
-module.exports.loadMessagesFor = SMSHandlerModule.loadMessagesFor
-module.exports.sendMessage = SMSHandlerModule.sendMessage
-module.exports = SMSHandlerModule
+module.exports.loadMessages = SMSHandlerModule.loadMessages;
+module.exports.sendMessage = SMSHandlerModule.sendMessage;
+module.exports = SMSHandlerModule;
