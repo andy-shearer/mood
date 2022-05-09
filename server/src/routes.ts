@@ -1,5 +1,9 @@
 import { Response, Request, Express } from "express";
+import createContactHandler from "./controllers/contact.controller";
+import { body } from "express-validator";
 import { googleOauthHandler } from "./controllers/session.controller";
+
+import requireUser from "./middleware/requireUser";
 
 function routes(app: Express) {
   // Performance & healthCheck
@@ -9,6 +13,13 @@ function routes(app: Express) {
 
   // OAuth
   app.get("/api/sessions/oauth/google", googleOauthHandler);
+
+  // Collect user contact details
+  app.get(
+    "/api/contact/",
+    [requireUser, body("mobile").isEmpty(), body("social").isEmpty()],
+    createContactHandler
+  );
 }
 
 export default routes;
