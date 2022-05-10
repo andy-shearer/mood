@@ -1,5 +1,4 @@
 import NextHead from 'next/head'
-import Image from 'next/image'
 import {
   Flex, 
   VStack , 
@@ -8,23 +7,14 @@ import {
   FormLabel,
   Input,
   Avatar,
-  Button} from '@chakra-ui/react'
+  Button,
+  Image,
+  Icon} from '@chakra-ui/react'
 import { useState } from 'react'
 
-
+import {FcGoogle} from 'react-icons/fc'
 export default function Home() {
 
-    
-    const [namevalue , setNamevalue] = useState('') 
-      
-    const handleNameChange = (e) =>setNamevalue(e.target.value)
-
-    
-    const [emailvalue , setEmailValue] = useState('')
-    
-    const handleEmailChange = (e) => setEmailValue(e.target.value)
-
-    const isError = namevalue === '' || emailvalue === ''
 
   return (
 
@@ -45,11 +35,11 @@ export default function Home() {
 
         <Flex
             overflow='hidden'
-            gap={20}
+            
             bg='blackAlpha.500'
             borderRadius={14}
             alignItems='center'
-            justifyContent='space-around'
+            justifyContent='center'
             boxShadow='2xl'
             width='fit-content'
             maxW='90%'
@@ -57,59 +47,50 @@ export default function Home() {
             
             flexDir={{base:'column' ,  lg:'row' }}
             >
-       
-          <VStack
-            px={10}
-            py={20}
-              >
-              <Text as='h1'
-                  fontSize='clamp(1.8rem , 5vmin , 2.5rem)'  
-                  >Mood Diary NFT
+  
+          <Image
+              boxSize='60vh'
+              objectFit='cover' 
+              src='./hero.jpg' alt='hero-image' />
+      
         
-               </Text>
-          </VStack>
-        
-        <FormControl
-            isInvalid={isError}
-            isRequired
-            bg='blackAlpha.400'
-            px={10}
-            py={20}  
-             maxW='80vw'
-              width='inherit' 
-              >
+         <Flex
             
-            <Avatar></Avatar>
-            <FormLabel htmlFor='name' mt='4' >Name</FormLabel> 
-            <Input 
-                value={namevalue}
-               onChange={handleNameChange} 
-              id='name' placeholder='Enter your name' />
-            <FormLabel mt='4'>Email</FormLabel>
-            <Input
-              value={emailvalue}
-              onChange={handleEmailChange}
-              isRequired
-              id='email'
-              type='email'
-              placeholder='Enter your email' 
-              />
-        <Button
-           isDisabled={isError} 
-            mt='4'
-            width='full'
-            _hover={{bg:'blue.900'}}
-            bg='blue.400'
-            type='submit' >
-            Submit
+              width={{base:'100%' , lg:'fit-content'}}
+            height={{base:'10rem' , lg:'60vh'}}
+            borderColor='blue'
+            alignItems='center'
+            justifyContent='center'
+              > 
+      
+          <Button
+              gap={4}
+              display='flex'
+              flexDir='column'
+              justifyContent='center'
+              width='full'
+              px='12'
+              _active={{
+                  bg:'slategrey'
+              }}
+              _hover={{
+                   bg:'blackAlpha.800' 
+              }}
+              borderRadius={0}
+              height='full'
+              bg='blackAlpha.300'>
+            <Text as='h1' fontSize='clamp(1.6rem , 3vmin , 2.3rem)'>Sign in Using Google</Text>
+            
+          <Icon w={{base:'12', lg:'16'}} h={{base:'12', lg:'16'}} as={FcGoogle} / >
+      
         </Button>
-      </FormControl>
-
+          
+        </Flex>
 
         </Flex>
   
 
-      
+                 
 
 
         

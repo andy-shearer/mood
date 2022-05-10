@@ -1,0 +1,68 @@
+import NextHead from 'next/head'
+import {
+  Flex, 
+  VStack , 
+  Text,
+  FormControl,
+  FormLabel,
+  Input,
+  Avatar,
+  Button,
+  Image} from '@chakra-ui/react'
+import { useState } from 'react'
+
+
+export default function Home() {
+
+
+  return (
+
+      <Flex
+          textColor='whiteAlpha.800'
+          minH='100vh'
+          minW='100vw'
+          bg='blackAlpha.800'
+          alignItems='center'
+          justifyContent='center'
+            >
+      <NextHead>
+        <title>Mood Diary</title>
+        <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+      </NextHead>
+      
+          
+
+        <Flex
+            overflow='hidden'
+            gap={20}
+            bg='blackAlpha.500'
+            borderRadius={14}
+            alignItems='center'
+            justifyContent='space-around'
+            boxShadow='2xl'
+            width='fit-content'
+            maxW='90%'
+            height='fit-content'
+            
+            flexDir={{base:'column' ,  lg:'row' }}
+            >
+  
+          <Image 
+              flex={'1/2'}  
+              src='./hero.jpg' alt='hero-image' />
+        
+
+
+        </Flex>
+  
+
+                 
+
+
+        
+
+      </Flex>
+    
+      
+  )
+}
