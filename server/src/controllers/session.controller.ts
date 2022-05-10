@@ -36,6 +36,7 @@ export async function googleOauthHandler(req: Request, res: Response) {
     // get the user with token
     const googleUser = await getGoogleUser({ id_token, access_token });
     // jwt.decode(id_token)
+    // console.log({ googleUser });
 
     if (!googleUser.verified_email) {
       return res.status(403).send("Google Account is not verfied");
@@ -86,9 +87,11 @@ export async function googleOauthHandler(req: Request, res: Response) {
     res.cookie("accessToken", accessToken, accessTokenCookieOptions);
     res.cookie("refreshToken", refreshToken, refreshTokenCookieOptions);
 
+    // console.log({ accessToken, refreshToken });
     // redirect back to client
-    res.redirect(config.get("origin"));
+    res.redirect(`${config.get("origin")}/dashboard`);
   } catch (error: any) {
+    // console.log(error);
     log.error(error, "Failed to authorize Google user");
     return res.redirect(`${config.get("origin")}/oauth/error`);
   }
