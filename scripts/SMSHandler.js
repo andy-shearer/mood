@@ -7,22 +7,44 @@ let initialised = false;
 let client;
 
 async function initialiseClient() {
-  const token = AccessTokenGenerator.generate();
-  console.debug("Token to use in client creation",token);
-  client = await Client.create(token);
-  console.log("CLIENT INITIALISED!");
-
-  client.on('stateChanged', (state) => {
-    console.debug("Twilio Conversations client state changed:", state);
-    if (state === 'initialized') {
-      initialised = true;
+  try {
+      if(!client){
+        console.debug("Initialising Client");
+        const token = AccessTokenGenerator.generate();
+        client = new Client(token);
+        await new Promise(resolve => {
+            client.on('stateChanged', state => {
+                console.log(`client state changed to =>${state}`);
+                if (state === 'initialized') {
+                    initialised = true;
+                    resolve();
+                }
+            });
+        });
+      }
+      console.log(client);
+      client.on('tokenAboutToExpire', refreshToken);
+      client.on('tokenAboutToExpire', refreshToken);
+    } catch(err) {
+      console.log("Failed initialize Twilio Client");
+      console.log(err);
     }
-  });
+
+}
+
+async function refreshToken(){
+  try {
+    let token = AccessTokenGenerator.generate();
+    client.updateToken(token);
+  } catch(err) {
+    console.log('Failed to RefreshToken');
+    console.log(err);
+  }
 }
 
 async function testWaitForInitialisation() {
   do {
-    console.log("Initialised:", initialised);
+    console.log("Client connection state:", client.connectionState);
     sleep(1000);
   } while(!initialised);
 

@@ -6,15 +6,7 @@ const twilioApiSecret = process.env.TWILIO_MOOD_API_SECRET;
 function generate() {
   const AccessToken = require('twilio').jwt.AccessToken;
   const ChatGrant = AccessToken.ChatGrant;
-
-  // Used specifically for creating Chat tokens
   const identity = 'MoodBot';
-
-  // Create a "grant" which enables a client to use Chat as a given user,
-  // on a given device
-  const chatGrant = new ChatGrant({
-    serviceSid: defaultChatServiceSid,
-  });
 
   // Create an access token which we will sign and return to the client,
   // containing the grant we just created
@@ -25,6 +17,11 @@ function generate() {
     {identity: identity}
   );
 
+  // Create a "grant" which enables a client to use Chat as a given user,
+  // on a given device
+  const chatGrant = new ChatGrant({
+    serviceSid: defaultChatServiceSid,
+  });
   token.addGrant(chatGrant);
 
   // Serialize the token to a JWT string
