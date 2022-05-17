@@ -33,18 +33,29 @@ async function getConversationSID(participantSid) {
        * TODO: If so, we could decide which conversation to use by collecting all matched conversations and
        * TODO: filtering by 'last_read_timestamp' or 'last_read_message_index'
        */
-      console.debug("Conversation", c.sid, "contains participant", participantSid);
+      //console.debug("Conversation", c.sid, "contains participant", participantSid);
       return c.sid;
     }
   }
 }
 
+/**
+ * Retrieves all ConversationMessage instances from a Conversation Instance
+ *
+ * See API docs for details:
+ * https://www.twilio.com/docs/conversations/api/conversation-message-resource#conversationmessage-properties
+ */
+async function listConversationMessages(conversationSid) {
+  const messages = await client.conversations.conversations(conversationSid)
+    .messages
+    .list();
+  //console.debug(messages);
+  return messages;
+}
+
 async function loadMessages(conversationSid) {
-  const conv = await client.getConversationBySid(conversationSid);
-  console.log("Printing all messages in the conversation...");
-  const messages = await conv.getMessages();
-  messages.items.forEach(msg => console.log(msg));
-  //TODO Handle pagination
+  const messages = await listConversationMessages(conversationSid);
+  return messages.map(msg => msg.body);
 }
 
 async function sendMessage(participantSid, message) {
@@ -57,23 +68,6 @@ async function _sendMessage(conversationSid, mBody) {
     .messages
     .create({author: 'moodBot', body: mBody});
   console.debug("Sent a new message with msgSid", message.sid);
-}
-
-async function getConversation(recipient, convSid) {
-  if (convSid) {
-    const conv = await client.getConversationBySid(convSid);
-    return conv;
-  } else {
-    const name = `conv_${new Date().getTime()}`;
-    const conversation = await client.createConversation({
-      uniqueName: name,
-      friendlyName: name,
-      attributes: {
-        user: recipient
-      }
-    });
-    return conversation;
-  }
 }
 
 async function validateParticipant(conv, recipient) {
@@ -102,13 +96,11 @@ async function validateParticipant(conv, recipient) {
 const SMSHandlerModule = {
   loadMessages,
   sendMessage,
-  getChatParticipants,
   getConversationSID
 }
 
 module.exports.loadMessages = SMSHandlerModule.loadMessages;
 module.exports.sendMessage = SMSHandlerModule.sendMessage;
-module.exports.getChatParticipants = SMSHandlerModule.getChatParticipants;
 module.exports.getConversationSID = SMSHandlerModule.getConversationSID;
 module.exports = SMSHandlerModule;
 
