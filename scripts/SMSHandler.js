@@ -10,14 +10,33 @@ const senderNo = process.env.SENDER_NUMBER;
  *
  * Returns an array of ConversationParticipant resources. See API docs for the resource:
  * https://www.twilio.com/docs/conversations/api/conversation-participant-resource
- **/
+ */
 async function getChatParticipants(conversationSid) {
-  console.debug("Listing conversation participants for conv", conversationSid);
+  //console.debug("Listing conversation participants for conv", conversationSid);
   const convParts = await client.conversations.conversations(conversationSid)
     .participants
     .list();
-  console.debug(convParts);
+  //console.debug(convParts);
   return convParts;
+}
+
+async function getConversationSID(participantSid) {
+  const allConversations = await client.conversations.conversations
+    .list()
+  for(let i=0; i<allConversations.length; i++) {
+    const c = allConversations[i];
+    const convParticipants = await getChatParticipants(c.sid);
+    const convContainsParticipant = convParticipants.find(participant => participant.sid === participantSid);
+    if(convContainsParticipant) {
+      /**
+       * TODO: Will the participant ever be listed in more than one conversation?
+       * TODO: If so, we could decide which conversation to use by collecting all matched conversations and
+       * TODO: filtering by 'last_read_timestamp' or 'last_read_message_index'
+       */
+      console.debug("Conversation", c.sid, "contains participant", participantSid);
+      return c.sid;
+    }
+  }
 }
 
 async function loadMessages(conversationSid, msgLimit = 30) {
@@ -84,11 +103,13 @@ async function validateParticipant(conv, recipient) {
 const SMSHandlerModule = {
   loadMessages,
   sendMessage,
-  getChatParticipants
+  getChatParticipants,
+  getConversationSID
 }
 
 module.exports.loadMessages = SMSHandlerModule.loadMessages;
 module.exports.sendMessage = SMSHandlerModule.sendMessage;
 module.exports.getChatParticipants = SMSHandlerModule.getChatParticipants;
+module.exports.getConversationSID = SMSHandlerModule.getConversationSID;
 module.exports = SMSHandlerModule;
 
