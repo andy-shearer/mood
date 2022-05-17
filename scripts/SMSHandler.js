@@ -1,69 +1,26 @@
 require("dotenv").config();
-const { Client } = require('@twilio/conversations');
-const AccessTokenGenerator = require("../scripts/AccessTokenGenerator");
+const acctSid = process.env.TWILIO_ACCOUNT_SID;
 const authToken = process.env.TWILIO_AUTH_TOKEN;
+const client = require('twilio')(acctSid, authToken);
 const senderNo = process.env.SENDER_NUMBER;
-let initialised = false;
-let client;
 
-async function initialiseClient() {
-  try {
-      if(!client){
-        console.debug("Initialising Client");
-        const token = AccessTokenGenerator.generate();
-        client = new Client(token);
-        await new Promise(resolve => {
-            client.on('stateChanged', state => {
-                console.log(`client state changed to =>${state}`);
-                if (state === 'initialized') {
-                    initialised = true;
-                    resolve();
-                }
-            });
-        });
-      }
-      console.log(client);
-      client.on('tokenAboutToExpire', refreshToken);
-      client.on('tokenAboutToExpire', refreshToken);
-    } catch(err) {
-      console.log("Failed initialize Twilio Client");
-      console.log(err);
-    }
-
+/**
+ * Performs a lookup of the ConversationParticipant resources that are associated with
+ * the provided Conversation SID.
+ *
+ * Returns an array of ConversationParticipant resources. See API docs for the resource:
+ * https://www.twilio.com/docs/conversations/api/conversation-participant-resource
+ **/
+async function getChatParticipants(conversationSid) {
+  console.debug("Listing conversation participants for conv", conversationSid);
+  const convParts = await client.conversations.conversations(conversationSid)
+    .participants
+    .list();
+  console.debug(convParts);
+  return convParts;
 }
-
-async function refreshToken(){
-  try {
-    let token = AccessTokenGenerator.generate();
-    client.updateToken(token);
-  } catch(err) {
-    console.log('Failed to RefreshToken');
-    console.log(err);
-  }
-}
-
-async function testWaitForInitialisation() {
-  do {
-    console.log("Client connection state:", client.connectionState);
-    sleep(1000);
-  } while(!initialised);
-
-  console.log("Final... Initialised:", initialised);
-}
-
- function sleep(milliseconds) {
-      let timeStart = new Date().getTime();
-      while (true) {
-          let elapsedTime = new Date().getTime() - timeStart;
-          if (elapsedTime > milliseconds) {
-              break;
-          }
-      }
-  }
-
 
 async function loadMessages(conversationSid, msgLimit = 30) {
-  await waitForInitialisation();
   const conv = await client.getConversationBySid(conversationSid);
   console.log("Printing all messages in the conversation...");
   const messages = await conv.getMessages(msgLimit);
@@ -71,33 +28,13 @@ async function loadMessages(conversationSid, msgLimit = 30) {
   //TODO Handle pagination
 }
 
-async function waitForInitialisation() {
-  if(!initialised) {
-    const MAX = 15000;
-    let timeout = 5000;
-    do {
-      setTimeout(() => console.log("Sleeping for", timeout, "ms"), timeout);
-      timeout += 5000;
-    } while (timeout <= MAX);
-
-    if(!initialised) {
-      const msg = "Conversations client not initialised before timeout";
-      console.error(msg);
-      throw msg;
-    }
-  } else {
-    console.log("Conversations client is initialised");
-  }
-}
-
 async function sendMessage(recipient, message, conversationSid) {
-  await waitForInitialisation();
   const conversation = await getConversation(recipient, conversationSid);
   await validateParticipant(conversation, recipient);
   const msgSid = await conversation.sendMessage(
     message,
     {
-      author: 'moodHQ'
+      author: 'moodBot'
     }
   );
 
@@ -105,14 +42,14 @@ async function sendMessage(recipient, message, conversationSid) {
 }
 
 async function getConversation(recipient, convSid) {
-  await waitForInitialisation();
   if (convSid) {
     const conv = await client.getConversationBySid(convSid);
     return conv;
   } else {
+    const name = `conv_${new Date().getTime()}`;
     const conversation = await client.createConversation({
-      uniqueName: `conv_${new Date().getTime()}`,
-      friendlyName: `Conversation with ${recipient}`,
+      uniqueName: name,
+      friendlyName: name,
       attributes: {
         user: recipient
       }
@@ -122,7 +59,7 @@ async function getConversation(recipient, convSid) {
 }
 
 async function validateParticipant(conv, recipient) {
-  await waitForInitialisation();
+
   const participants = await conv.getParticipants();
 
   for(let i=0; i<participants.length; i++) {
@@ -147,13 +84,11 @@ async function validateParticipant(conv, recipient) {
 const SMSHandlerModule = {
   loadMessages,
   sendMessage,
-  testWaitForInitialisation
+  getChatParticipants
 }
-
-initialiseClient();
 
 module.exports.loadMessages = SMSHandlerModule.loadMessages;
 module.exports.sendMessage = SMSHandlerModule.sendMessage;
-module.exports.testWaitForInitialisation = SMSHandlerModule.testWaitForInitialisation;
+module.exports.getChatParticipants = SMSHandlerModule.getChatParticipants;
 module.exports = SMSHandlerModule;
 

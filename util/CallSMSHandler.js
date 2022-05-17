@@ -8,10 +8,10 @@ const verifiedRcp = process.env.VERIFIED_RECIPIENT_NUMBER;
  * Helper class to call the SMSHelper functions
  */
 async function main() {
-  const timeString = new Date().toLocaleTimeString("en-GB");
-  await SMSHandler.testWaitForInitialisation();
-//  await SMSHandler.sendMessage(verifiedRcp, `Hey this message is going out to you at ${timeString}`, convSid);
-//  await SMSHandler.loadMessages(convSid);
+  await SMSHandler.getChatParticipants(convSid);
+  //const timeString = new Date().toLocaleTimeString("en-GB");
+  //await SMSHandler.sendMessage(verifiedRcp, `Hey this message is going out to you at ${timeString}`, convSid);
+  //await SMSHandler.loadMessages(convSid);
 }
 
 main()
