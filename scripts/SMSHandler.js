@@ -47,7 +47,12 @@ async function loadMessages(conversationSid) {
   //TODO Handle pagination
 }
 
-async function sendMessage(conversationSid, mBody) {
+async function sendMessage(participantSid, message) {
+  const cSid = await getConversationSID(participantSid);
+  await _sendMessage(cSid, message);
+}
+
+async function _sendMessage(conversationSid, mBody) {
   const message = await client.conversations.conversations(conversationSid)
     .messages
     .create({author: 'moodBot', body: mBody});

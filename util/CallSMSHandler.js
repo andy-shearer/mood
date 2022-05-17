@@ -9,11 +9,9 @@ const participantSid = process.env.EXAMPLE_CONVERSATION_PARTICIPANT_SID;
  * Helper class to call the SMSHelper functions
  */
 async function main() {
-  const cSid = await SMSHandler.getConversationSID(participantSid); // ParticipantSid will be stored in the database for every user
-
   const timeString = new Date().toLocaleTimeString("en-GB");
   await SMSHandler.sendMessage(
-    cSid,
+    participantSid,
     `Hey this message is going out to you at ${timeString}`
   );
 
