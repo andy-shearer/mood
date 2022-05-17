@@ -20,5 +20,8 @@
     "@twilio/conversations": "^2.1.0",
     "dotenv": "^16.0.0",
     "twilio": "^3.76.1"
+  },
+  "devDependencies": {
+    "ngrok": "^4.3.1"
   }
 }
