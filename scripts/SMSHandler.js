@@ -39,25 +39,19 @@ async function getConversationSID(participantSid) {
   }
 }
 
-async function loadMessages(conversationSid, msgLimit = 30) {
+async function loadMessages(conversationSid) {
   const conv = await client.getConversationBySid(conversationSid);
   console.log("Printing all messages in the conversation...");
-  const messages = await conv.getMessages(msgLimit);
+  const messages = await conv.getMessages();
   messages.items.forEach(msg => console.log(msg));
   //TODO Handle pagination
 }
 
-async function sendMessage(recipient, message, conversationSid) {
-  const conversation = await getConversation(recipient, conversationSid);
-  await validateParticipant(conversation, recipient);
-  const msgSid = await conversation.sendMessage(
-    message,
-    {
-      author: 'moodBot'
-    }
-  );
-
-  console.debug("Sent a new message with index", msgSid);
+async function sendMessage(conversationSid, mBody) {
+  const message = await client.conversations.conversations(conversationSid)
+    .messages
+    .create({author: 'moodBot', body: mBody});
+  console.debug("Sent a new message with msgSid", message.sid);
 }
 
 async function getConversation(recipient, convSid) {

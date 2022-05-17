@@ -9,10 +9,14 @@ const participantSid = process.env.EXAMPLE_CONVERSATION_PARTICIPANT_SID;
  * Helper class to call the SMSHelper functions
  */
 async function main() {
-  // await SMSHandler.getChatParticipants(convSid); // Print all participants in our created Conversation instance
   const cSid = await SMSHandler.getConversationSID(participantSid); // ParticipantSid will be stored in the database for every user
-  //const timeString = new Date().toLocaleTimeString("en-GB");
-  //await SMSHandler.sendMessage(verifiedRcp, `Hey this message is going out to you at ${timeString}`, convSid);
+
+  const timeString = new Date().toLocaleTimeString("en-GB");
+  await SMSHandler.sendMessage(
+    cSid,
+    `Hey this message is going out to you at ${timeString}`
+  );
+
   //await SMSHandler.loadMessages(convSid);
 }
 
