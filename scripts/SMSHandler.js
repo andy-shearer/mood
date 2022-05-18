@@ -93,14 +93,25 @@ async function validateParticipant(conv, recipient) {
   console.log("ParticipantResponse for newly created conversation participant", response);
 }
 
+async function deleteAllConversations() {
+  const conversations = await client.conversations.conversations.list();
+  for(let i=0; i<conversations.length; i++) {
+    const convSid = conversations[i].sid;
+    console.debug("Deleting conversation", convSid);
+    await client.conversations.conversations(convSid).remove();
+  }
+}
+
 const SMSHandlerModule = {
   loadMessages,
   sendMessage,
-  getConversationSID
+  getConversationSID,
+  deleteAllConversations
 }
 
 module.exports.loadMessages = SMSHandlerModule.loadMessages;
 module.exports.sendMessage = SMSHandlerModule.sendMessage;
 module.exports.getConversationSID = SMSHandlerModule.getConversationSID;
+module.exports.deleteAllConversations = SMSHandlerModule.deleteAllConversations;
 module.exports = SMSHandlerModule;
 
