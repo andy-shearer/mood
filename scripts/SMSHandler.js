@@ -22,21 +22,37 @@ async function getChatParticipants(conversationSid) {
 
 async function getConversationSID(participantSid) {
   const allConversations = await client.conversations.conversations
-    .list()
+    .list();
   for(let i=0; i<allConversations.length; i++) {
     const c = allConversations[i];
     const convParticipants = await getChatParticipants(c.sid);
     const convContainsParticipant = convParticipants.find(participant => participant.sid === participantSid);
     if(convContainsParticipant) {
-      /**
-       * TODO: Will the participant ever be listed in more than one conversation?
-       * TODO: If so, we could decide which conversation to use by collecting all matched conversations and
-       * TODO: filtering by 'last_read_timestamp' or 'last_read_message_index'
-       */
-      //console.debug("Conversation", c.sid, "contains participant", participantSid);
       return c.sid;
     }
   }
+
+  // TODO: If we don't have a ConversationSID for this participant, create one and add them as a ConversationParticipant
+}
+
+/**
+ * Creates a new conversation for the provided phone number, and adds the number as a Conversation Participant.
+ * Returns the ConversationParticipantSID to be used in future calls.
+ */
+async function createConversationForUser(userPhoneNumber) {
+  const conversation = await client.conversations.conversations
+    .create({
+       friendlyName: 'Mood Conversation'
+     });
+
+  const participant = await client.conversations.conversations(conversation.sid)
+    .participants
+    .create({
+       'messagingBinding.address': userPhoneNumber,
+       'messagingBinding.proxyAddress': senderNo
+     });
+
+   return participant.sid;
 }
 
 /**
@@ -70,29 +86,6 @@ async function _sendMessage(conversationSid, mBody) {
   console.debug("Sent a new message with msgSid", message.sid);
 }
 
-async function validateParticipant(conv, recipient) {
-
-  const participants = await conv.getParticipants();
-
-  for(let i=0; i<participants.length; i++) {
-    console.debug("Conversation participant", i, participants[i]);
-    if(participants[i].attributes.user === recipient) {
-      return;
-    }
-  }
-
-  // Add the participant to the conversation
-  const response = await conv.addNonChatParticipant(
-    senderNo,
-    recipient,
-    {
-      user: recipient
-    }
-  );
-
-  console.log("ParticipantResponse for newly created conversation participant", response);
-}
-
 async function deleteAllConversations() {
   const conversations = await client.conversations.conversations.list();
   for(let i=0; i<conversations.length; i++) {
@@ -106,12 +99,14 @@ const SMSHandlerModule = {
   loadMessages,
   sendMessage,
   getConversationSID,
-  deleteAllConversations
+  deleteAllConversations,
+  createConversationForUser
 }
 
 module.exports.loadMessages = SMSHandlerModule.loadMessages;
 module.exports.sendMessage = SMSHandlerModule.sendMessage;
 module.exports.getConversationSID = SMSHandlerModule.getConversationSID;
 module.exports.deleteAllConversations = SMSHandlerModule.deleteAllConversations;
+module.exports.createConversationForUser = SMSHandlerModule.createConversationForUser;
 module.exports = SMSHandlerModule;
 
