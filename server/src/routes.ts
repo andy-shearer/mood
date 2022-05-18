@@ -2,6 +2,7 @@ import { Response, Request, Express } from "express";
 import createContactHandler from "./controllers/contact.controller";
 import { body } from "express-validator";
 import { googleOauthHandler } from "./controllers/session.controller";
+import { webhookHandler } from "./controllers/webhook.controller";
 
 import requireUser from "./middleware/requireUser";
 
@@ -20,6 +21,9 @@ function routes(app: Express) {
     [requireUser, body("mobile").isEmpty(), body("social").isEmpty()],
     createContactHandler
   );
+
+  // Webhook handler for SMS events
+  app.get("/webhook", webhookHandler);
 }
 
 export default routes;

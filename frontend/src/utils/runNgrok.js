@@ -1,7 +1,7 @@
 const ngrok = require('ngrok');
 
 (async function() {
-  const url = await ngrok.connect(3000);
+  const url = await ngrok.connect(1337);
   console.log(url);
 })();
 
