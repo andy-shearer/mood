@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
-import { createContact } from "../services/contact.service";
+import { createContact, findContact } from "../services/contact.service";
 import { validationResult } from "express-validator";
 import log from "../utils/logger";
 
-const createContactHandler = async (req: Request, res: Response) => {
+export async function createContactHandler(req: Request, res: Response) {
   const body = req.body;
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -17,6 +17,16 @@ const createContactHandler = async (req: Request, res: Response) => {
     log.error(error);
     return res.status(409).send(error.message);
   }
-};
+}
 
-export default createContactHandler;
+export async function getContactInfoHandler(req: Request, res: Response) {
+  const userId = res.locals.user._id;
+
+  const contact = await findContact({ userId });
+
+  if (!contact) {
+    return res.sendStatus(404);
+  }
+
+  return res.send(contact);
+}
