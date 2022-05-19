@@ -14,9 +14,9 @@ async function main() {
     `Hey this message is going out to you at ${timeString}`
   );
 
-  const conversationSid = await SMSHandler.getConversationSID(participantSid);
-  const messages = await SMSHandler.loadMessages(conversationSid);
-  console.log(messages);
+//  const conversationSid = await SMSHandler.getConversationSID(participantSid);
+//  const messages = await SMSHandler.loadMessages(conversationSid);
+//  console.log(messages);
 }
 
 main()

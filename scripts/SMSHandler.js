@@ -1,8 +1,8 @@
 require("dotenv").config();
 const acctSid = process.env.TWILIO_ACCOUNT_SID;
 const authToken = process.env.TWILIO_AUTH_TOKEN;
-const client = require('twilio')(acctSid, authToken);
 const senderNo = process.env.SENDER_NUMBER;
+const client = require('twilio')(acctSid, authToken);
 
 /**
  * Performs a lookup of the ConversationParticipant resources that are associated with
