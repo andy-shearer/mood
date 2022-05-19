@@ -3,7 +3,7 @@ import {
   createContactHandler,
   getContactInfoHandler,
 } from "./controllers/contact.controller";
-import { body } from "express-validator";
+import { body, check } from "express-validator";
 import { googleOauthHandler } from "./controllers/session.controller";
 import { webhookHandler } from "./controllers/webhook.controller";
 
@@ -21,7 +21,7 @@ function routes(app: Express) {
   // Create user contact details
   app.post(
     "/api/contact",
-    [requireUser, body("mobile").isEmpty(), body("social").isEmpty()],
+    [requireUser, check("mobile").exists(), check("social").exists()],
     createContactHandler
   );
 

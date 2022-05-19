@@ -2,15 +2,21 @@ import { Request, Response } from "express";
 import { createContact, findContact } from "../services/contact.service";
 import { validationResult } from "express-validator";
 import log from "../utils/logger";
+import mongoose from "mongoose";
 
 export async function createContactHandler(req: Request, res: Response) {
+  const userId = res.locals.user._id;
+  // console.log(userId);
   const body = req.body;
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
   }
   try {
-    const contact = await createContact(body);
+    const contact = await createContact({
+      ...body,
+      user: userId,
+    });
 
     return res.send(contact);
   } catch (error: any) {
