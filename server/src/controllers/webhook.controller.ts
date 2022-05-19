@@ -1,23 +1,22 @@
 import { Request, Response } from "express";
 import log from "../utils/logger";
 
-export async function webhookHandler (req: Request, res: Response) {
+export async function webhookHandler(req: Request, res: Response) {
   // TODO: Authenticate 'X-Twilio-Signature' header
   const query = req.query;
-  if(query.EventType === "onMessageAdded") {
+  if (query.EventType === "onMessageAdded") {
     log.info("RECEIVED INBOUND MESSAGE from " + query.Author);
     log.info("Message body: " + query.Body);
     log.debug(query);
-  } else if(query.EventType) {
+  } else if (query.EventType) {
     log.info("Event received " + query.EventType);
   }
   //log.debug(req);
 
   res.status(200).json({
-    message: 'Hi 👋'
+    message: "Hi 👋",
   });
-  
-};
+}
 
 // EXAMPLE 'onMessageAdded' event HTTP POST body:
 //

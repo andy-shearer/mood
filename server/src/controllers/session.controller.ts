@@ -58,8 +58,11 @@ export async function googleOauthHandler(req: Request, res: Response) {
       return;
     }
 
+    // console.log(user._id);
+
     // create a session
     const session = await createSession(user._id, req.get("user-agent") || "");
+    // console.log({ session });
 
     // create an access token
     const accessToken = signJwt(
@@ -87,7 +90,7 @@ export async function googleOauthHandler(req: Request, res: Response) {
     res.cookie("accessToken", accessToken, accessTokenCookieOptions);
     res.cookie("refreshToken", refreshToken, refreshTokenCookieOptions);
 
-    // console.log({ accessToken, refreshToken });
+    // console.log({ accessToken });
     // redirect back to client
     res.redirect(`${config.get("origin")}/dashboard`);
   } catch (error: any) {
