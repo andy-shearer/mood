@@ -19,10 +19,6 @@ Chatbobt conversation analysis to build a picture of users' mood over time. Proj
 
 ## Baby Steps
 
-- Clone the project
-
-      git clone https://github.com/hubswitch-africa/hubswitch.git
-
 - To setup the project on your local machine, run
 
       npm install
