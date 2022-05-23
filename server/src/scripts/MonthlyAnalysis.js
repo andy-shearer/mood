@@ -45,11 +45,12 @@ function getConversationPairs(msgs) {
 
       // Ensure the next message in the conversation is an inbound message (answer)
       if( (nextMsg != null) && (nextMsg.participant_sid) ) {
+        const type = getQuestionType(currentMsg);
         let pair = {
           "question": currentMsg.body,
-          "type": getQuestionType(currentMsg),
+          "type": type,
           "reply": nextMsg.body,
-          "target": getReplyTarget(nextMsg),
+          "target": getReplyTarget(nextMsg, type),
           "day": getDay(nextMsg)
         }
 
@@ -68,14 +69,36 @@ function getConversationPairs(msgs) {
   return messagePairs;
 }
 
+// Classify which type of question this message is
 function getQuestionType(msg) {
-  // TODO
-  return msg.body;
+  const body = msg.body;
+
+  if(body.includes("1 word")) {
+    return "word";
+  } else if(body.includes("GOOD/OK/BAD")) {
+    return "options";
+  } else if(body.includes("0-10")) {
+    return "rating";
+  } else {
+    return "open";
+  }
 }
 
-function getReplyTarget(msg) {
-  // TODO
-  return msg.body;
+function getReplyTarget(msg, type) {
+  switch(type) {
+    case "word":
+      const matches = msg.body.match("(\\w+)/gm");
+      return matches ? matches[0] : msg.body;
+    case "options":
+      const matches = msg.body.match("good|bad|ok/gmi");
+      return matches ? matches[0] : msg.body;
+    case "rating":
+      const matches = msg.body.match("(\\d\\.\\d)|(\\d{1,2})/gm");
+      return matches ? matches[0] : msg.body;
+    case "open":
+    default:
+      return msg.body;
+  }
 }
 
 function getDay(msg) {
@@ -115,7 +138,7 @@ module.exports = MonthlyModule;
         },
         {
           question: "\"One word to describe today: __________.\" ✍️\n\nReply with 1 word!",
-          type: "open",
+          type: "word",
           reply: "Catastrophic 😩",
           target: "Catastrophic",
           day: "Monday"
