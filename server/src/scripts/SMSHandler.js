@@ -52,6 +52,7 @@ async function createConversationForUser(userPhoneNumber) {
        'messagingBinding.proxyAddress': senderNo
      });
 
+// ConversationParticipant UUID (UserSID)
    return participant.sid;
 }
 
