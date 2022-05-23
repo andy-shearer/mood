@@ -98,6 +98,7 @@ async function deleteAllConversations() {
 
 const SMSHandlerModule = {
   loadMessages,
+  listConversationMessages,
   sendMessage,
   getConversationSID,
   deleteAllConversations,
@@ -105,6 +106,7 @@ const SMSHandlerModule = {
 }
 
 module.exports.loadMessages = SMSHandlerModule.loadMessages;
+module.exports.listConversationMessages = SMSHandlerModule.listConversationMessages;
 module.exports.sendMessage = SMSHandlerModule.sendMessage;
 module.exports.getConversationSID = SMSHandlerModule.getConversationSID;
 module.exports.deleteAllConversations = SMSHandlerModule.deleteAllConversations;

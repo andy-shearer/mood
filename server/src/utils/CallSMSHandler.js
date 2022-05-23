@@ -17,14 +17,14 @@ function getMsg() {
  * Helper class to call the SMSHelper functions
  */
 async function main() {
-  await SMSHandler.sendMessage(
-    participantSid,
-    getMsg()
-  );
+//  await SMSHandler.sendMessage(
+//    participantSid,
+//    getMsg()
+//  );
 
-//  const conversationSid = await SMSHandler.getConversationSID(participantSid);
-//  const messages = await SMSHandler.loadMessages(conversationSid);
-//  console.log(messages);
+  const conversationSid = await SMSHandler.getConversationSID(participantSid);
+  const messages = await SMSHandler.listConversationMessages(conversationSid);
+  console.log(messages);
 }
 
 main()
