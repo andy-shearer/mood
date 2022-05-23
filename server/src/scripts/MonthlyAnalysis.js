@@ -2,7 +2,7 @@ const SMSHandler = require("./SMSHandler");
 const weekday = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
 async function conversationAnalysis(participantSID) {
-  const convSID = SMSHandler.getConversationSID(participantSID);
+  const convSID = await SMSHandler.getConversationSID(participantSID);
   let messages = await SMSHandler.listConversationMessages(convSID);
   messages = filterMessages(messages);
 
@@ -10,14 +10,14 @@ async function conversationAnalysis(participantSID) {
 }
 
 function filterMessages(msgs) {
+  console.log(msgs.length, "unfiltered messages");
   let cutoff = new Date();
   cutoff.setMonth(cutoff.getMonth() - 1);
 
-  // First filtering is to filter the messages exchanged within the last month
-  msgs = msgs.filter(msg => new Date(msg.date_created) >= cutoff);
-
-  // Second filtering is to parse all messages and obtain question & answer pairs
-  const convPairs = getConversationPairs(msgs);
+  // Filter the messages exchanged within the last month
+  msgs = msgs.filter(msg => new Date(msg.dateCreated >= cutoff));
+  console.log(msgs.length, "messages after filtering");
+  return msgs;
 }
 
 /**
@@ -39,12 +39,12 @@ function getConversationPairs(msgs) {
     const currentMsg = msgs[index];
     const nextMsg = (index+1 < numMsgs) ? msgs[index + 1] : null;
 
-    if(!currentMsg.participant_sid) {
+    if(!currentMsg.participantSid) {
       // This means that we're looking at an outbound message (question) rather than an inbound message (answer) because
-      // inbound messages (answers) always contain a 'participant_sid'
+      // inbound messages (answers) always contain a 'participantSid'
 
       // Ensure the next message in the conversation is an inbound message (answer)
-      if( (nextMsg != null) && (nextMsg.participant_sid) ) {
+      if( (nextMsg != null) && (nextMsg.participantSid) ) {
         const type = getQuestionType(currentMsg);
         let pair = {
           "question": currentMsg.body,
@@ -69,7 +69,7 @@ function getConversationPairs(msgs) {
   return messagePairs;
 }
 
-// Classify which type of question this message is
+// Classify this type of question
 function getQuestionType(msg) {
   const body = msg.body;
 
@@ -85,16 +85,19 @@ function getQuestionType(msg) {
 }
 
 function getReplyTarget(msg, type) {
+
+  // TODO fix regex passed to match
+
   switch(type) {
     case "word":
-      const matches = msg.body.match("(\\w+)/gm");
-      return matches ? matches[0] : msg.body;
+      const words = msg.body.match("(\\w+)/gm");
+      return words ? words[0] : "";
     case "options":
-      const matches = msg.body.match("good|bad|ok/gmi");
-      return matches ? matches[0] : msg.body;
+      const options = msg.body.match("good|bad|ok/gmi");
+      return options ? options[0] : "";
     case "rating":
-      const matches = msg.body.match("(\\d\\.\\d)|(\\d{1,2})/gm");
-      return matches ? matches[0] : msg.body;
+      const rating = msg.body.match("(\\d\\.\\d)|(\\d{1,2})/gm");
+      return rating ? rating[0] : "";
     case "open":
     default:
       return msg.body;
@@ -102,7 +105,7 @@ function getReplyTarget(msg, type) {
 }
 
 function getDay(msg) {
-  return weekday[new Date(msg.date_created).getDay()];
+  return weekday[new Date(msg.dateCreated).getDay()];
 }
 
 // Module exports
