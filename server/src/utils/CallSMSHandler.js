@@ -5,14 +5,21 @@ require("dotenv").config();
 const participantSid = process.env.EXAMPLE_CONVERSATION_PARTICIPANT_SID;
 const recipientNo = process.env.VERIFIED_RECIPIENT_NUMBER;
 
+function getMsg() {
+  if(new Date().getHours() < 12) {
+    return Daily.getMorningMsg();
+  } else {
+    return Daily.getAfternoonMsg();
+  }
+}
+
 /**
  * Helper class to call the SMSHelper functions
  */
 async function main() {
-  const timeString = new Date().toLocaleTimeString("en-GB");
   await SMSHandler.sendMessage(
     participantSid,
-    Daily.getMessage()
+    getMsg()
   );
 
 //  const conversationSid = await SMSHandler.getConversationSID(participantSid);

@@ -4,7 +4,11 @@ const Daily = require("../scripts/Daily");
  * Helper class to call the Daily message functions
  */
 async function main() {
-  console.log(Daily.getMessage());
+  for(let i=0; i <= 5; i++) {
+    console.log(Daily.getMorningMsg());
+    console.log(Daily.getAfternoonMsg());
+    console.log("=============");
+  }
 }
 
 main()
