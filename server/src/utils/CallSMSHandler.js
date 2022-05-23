@@ -1,4 +1,5 @@
 const SMSHandler = require("../scripts/SMSHandler");
+const Daily = require("../scripts/Daily");
 require("dotenv").config();
 
 const participantSid = process.env.EXAMPLE_CONVERSATION_PARTICIPANT_SID;
@@ -11,7 +12,7 @@ async function main() {
   const timeString = new Date().toLocaleTimeString("en-GB");
   await SMSHandler.sendMessage(
     participantSid,
-    `Hey this message is going out to you at ${timeString}`
+    Daily.getMessage()
   );
 
 //  const conversationSid = await SMSHandler.getConversationSID(participantSid);
