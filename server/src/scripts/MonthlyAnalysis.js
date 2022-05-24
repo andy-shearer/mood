@@ -90,13 +90,13 @@ function getReplyTarget(msg, type) {
 
   switch(type) {
     case "word":
-      const words = msg.body.match("(\\w+)/gm");
+      const words = msg.body.match(/(\w+)/gm);
       return words ? words[0] : "";
     case "options":
-      const options = msg.body.match("good|bad|ok/gmi");
+      const options = msg.body.match(/good|bad|ok/gmi);
       return options ? options[0] : "";
     case "rating":
-      const rating = msg.body.match("(\\d\\.\\d)|(\\d{1,2})/gm");
+      const rating = msg.body.match(/(\d\.\d)|(\d{1,2})/gm);
       return rating ? rating[0] : "";
     case "open":
     default:
