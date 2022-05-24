@@ -1,3 +1,9 @@
+/**
+ * Performs analysis over the past month of messages in a conversations. Analysis is only done on pairs of messages; a question
+ * we send to a user, and an answer that we receive from them. The conversationAnalysis function will return an array of analysed
+ * message pairs.
+ */
+
 const SMSHandler = require("./SMSHandler");
 const weekday = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
@@ -27,9 +33,6 @@ function filterMessages(msgs) {
  * Returns array of message pair objects (see example structure at the bottom of this file)
  */
 function getConversationPairs(msgs) {
-  // Assume that the messages are in ascending order, as that is the default for the API call to list conversation messages
-  // TODO: Sort the msgs array so we're not relying on the order returned from the API call
-
   // Iterate through the messages and pick off pairs
   let messagePairs = [];
   let index = 0;
@@ -85,9 +88,6 @@ function getQuestionType(msg) {
 }
 
 function getReplyTarget(msg, type) {
-
-  // TODO fix regex passed to match
-
   switch(type) {
     case "word":
       const words = msg.body.match(/(\w+)/gm);
@@ -122,6 +122,7 @@ module.exports = MonthlyModule;
     * Type - attempt to classify which type of question this was
     * Reply - message body that was received from the user in response to the question
     * Reply Target - this could be a 1 word reply, 'GOOD'/'OK'/'BAD', or a number from a 1-10 rating question
+    * Day - indicating which day the response was received - useful for detecting mood patterns
 
   An example of the conversation analysis that we might get:
       [

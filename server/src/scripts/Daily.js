@@ -1,3 +1,8 @@
+/**
+ * Returns a random daily question from a set of possible questions. Split into questions to ask in the morning and
+ * questions for the afternoon.
+ */
+
 const weekday = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
 if (!String.prototype.format) {
