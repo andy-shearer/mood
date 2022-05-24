@@ -52,6 +52,7 @@ async function createConversationForUser(userPhoneNumber) {
        'messagingBinding.proxyAddress': senderNo
      });
 
+// ConversationParticipant UUID (UserSID)
    return participant.sid;
 }
 
@@ -95,18 +96,31 @@ async function deleteAllConversations() {
   }
 }
 
+async function deleteMessagesInConversation(convSid) {
+  const messages = await listConversationMessages(convSid);
+  for(let i=0; i<messages.length; i++) {
+    await client.conversations.conversations(convSid)
+      .messages(messages[i].sid)
+      .remove();
+  }
+}
+
 const SMSHandlerModule = {
   loadMessages,
+  listConversationMessages,
   sendMessage,
   getConversationSID,
   deleteAllConversations,
+  deleteMessagesInConversation,
   createConversationForUser
 }
 
 module.exports.loadMessages = SMSHandlerModule.loadMessages;
+module.exports.listConversationMessages = SMSHandlerModule.listConversationMessages;
 module.exports.sendMessage = SMSHandlerModule.sendMessage;
 module.exports.getConversationSID = SMSHandlerModule.getConversationSID;
 module.exports.deleteAllConversations = SMSHandlerModule.deleteAllConversations;
+module.exports.deleteMessagesInConversation = SMSHandlerModule.deleteMessagesInConversation;
 module.exports.createConversationForUser = SMSHandlerModule.createConversationForUser;
 module.exports = SMSHandlerModule;
 
