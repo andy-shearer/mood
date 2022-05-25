@@ -1,5 +1,5 @@
 import express from "express";
-// import deserializeUser from "../middleware/deserializeUser";
+import deserializeUser from "../middleware/deserializeUser";
 import routes from "../routes";
 
 function creatServer() {
@@ -7,7 +7,7 @@ function creatServer() {
 
   app.use(express.json());
 
-  //   app.use(deserializeUser);
+  app.use(deserializeUser);
 
   routes(app);
 

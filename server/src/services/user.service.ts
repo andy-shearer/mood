@@ -5,6 +5,10 @@ import log from "../utils/logger";
 import qs from "qs";
 require("dotenv").config();
 
+export async function findUser(query: FilterQuery<UserDocument>) {
+  return UserModel.findOne(query).lean();
+}
+
 interface GoogleTokensResult {
   access_token: string;
   expires_in: string;
@@ -90,3 +94,4 @@ export async function findAndUpdateUser(
 ) {
   return UserModel.findOneAndUpdate(query, update, options);
 }
+//

@@ -1,7 +1,11 @@
 import { Response, Request, Express } from "express";
-import createContactHandler from "./controllers/contact.controller";
-import { body } from "express-validator";
+import {
+  createContactHandler,
+  getContactInfoHandler,
+} from "./controllers/contact.controller";
+import { body, check } from "express-validator";
 import { googleOauthHandler } from "./controllers/session.controller";
+import { webhookHandler } from "./controllers/webhook.controller";
 
 import requireUser from "./middleware/requireUser";
 
@@ -14,12 +18,18 @@ function routes(app: Express) {
   // OAuth
   app.get("/api/sessions/oauth/google", googleOauthHandler);
 
-  // Collect user contact details
-  app.get(
-    "/api/contact/",
-    [requireUser, body("mobile").isEmpty(), body("social").isEmpty()],
+  // Create user contact details
+  app.post(
+    "/api/contact",
+    [requireUser, check("mobile").exists(), check("social").exists()],
     createContactHandler
   );
+
+  // Get user contact details
+  app.get("/api/contact", requireUser, getContactInfoHandler);
+
+  // Webhook handler for SMS events
+  app.get("/webhook", webhookHandler);
 }
 
 export default routes;
