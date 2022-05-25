@@ -17,19 +17,6 @@ import { FcGoogle } from "react-icons/fc";
 import getGoogleOAuthURL from "../src/utils/getGoogleUrl";
 export default function Home() {
   return (
-    <Flex
-      textColor="whiteAlpha.800"
-      minH="100vh"
-      minW="100vw"
-      bg="blackAlpha.800"
-      alignItems="center"
-      justifyContent="center"
-    >
-      <NextHead>
-        <title>Mood Diary</title>
-        <meta name="viewport" content="initial-scale=1.0, width=device-width" />
-      </NextHead>
-
       <Flex
         overflow="hidden"
         bg="blackAlpha.500"
@@ -38,55 +25,52 @@ export default function Home() {
         justifyContent="center"
         boxShadow="2xl"
         width="fit-content"
-        maxW="90%"
+
         height="fit-content"
         flexDir={{ base: "column", lg: "row" }}
       >
         <Image
-          boxSize="60vh"
+          boxSize="60vmin"
           objectFit="cover"
           src="./hero.jpg"
           alt="hero-image"
         />
 
         <a href={getGoogleOAuthURL()}>
-          <Flex
-            width={{ base: "100%", lg: "fit-content" }}
-            height={{ base: "10rem", lg: "60vh" }}
+          
+            <Button
+            
+            width={{ base: "60vmin", lg: "fit-content" }}
+            height={{ base: "fit-content", lg: "60vmin" }}
             borderColor="blue"
             alignItems="center"
             justifyContent="center"
-          >
-            <Button
+               p={'3vmin'}  
               gap={4}
               display="flex"
-              flexDir="column"
-              justifyContent="center"
-              width="full"
-              px="12"
+              flexDir={{base:'row' , lg:'column'}}
+              
               _active={{
                 bg: "slategrey",
               }}
               _hover={{
                 bg: "blackAlpha.800",
-              }}
-              borderRadius={0}
-              height="full"
+              }} 
               bg="blackAlpha.300"
             >
-              <Text as="h1" fontSize="clamp(1.6rem , 3vmin , 2.3rem)">
+              <Text as="h1" fontSize="clamp(.6rem , 4vmin , 2rem)">
                 Sign in Using Google
               </Text>
 
               <Icon
-                w={{ base: "12", lg: "16" }}
-                h={{ base: "12", lg: "16" }}
+                w='6vmin'
+                h='6vmin'
                 as={FcGoogle}
               />
             </Button>
-          </Flex>
+         
         </a>
       </Flex>
-    </Flex>
+
   );
 }
