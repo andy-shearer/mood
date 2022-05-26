@@ -3,15 +3,19 @@
   "version": "1.0.0",
   "description": "Backend server for mood application",
   "main": "index.js",
-  "author": "Ernest & Noruwa",
+  "author": "Ernest",
   "license": "MIT",
   "scripts": {
-    "dev": "ts-node-dev --respawn --transpile-only src/app.ts"
+    "client": "npm run dev --prefix client",
+    "server": "ts-node-dev --respawn --transpile-only src/app.ts",
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm install --prefix client && npm run build --prefix client"
   },
   "dependencies": {
     "@types/mongoose": "^5.11.97",
     "axios": "^0.27.2",
     "bcrypt": "^5.0.1",
+    "concurrently": "^7.2.1",
     "config": "^3.3.7",
     "cors": "^2.8.5",
     "dayjs": "^1.11.1",
