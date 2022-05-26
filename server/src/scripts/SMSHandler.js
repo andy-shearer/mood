@@ -68,12 +68,10 @@ async function getConversationParticipantSid(userPhoneNumber) {
   const allConversations = await client.conversations.conversations
     .list();
 
-  console.log(allConversations.length);
   for(let i=0; i<allConversations.length; i++) {
     const c = allConversations[i];
     const convParticipants = await getChatParticipants(c.sid);
     const targetParticipant = convParticipants.find(participant => {
-      console.log(participant.messagingBinding.address, userPhoneNumber);
       return (participant.messagingBinding && participant.messagingBinding.address === userPhoneNumber);
     });
     if(targetParticipant) {
