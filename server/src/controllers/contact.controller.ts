@@ -1,8 +1,11 @@
 import { Request, Response } from "express";
-import { createContact, findContact } from "../services/contact.service";
+import {
+  createContact,
+  findAndUpdateContact,
+  findContact,
+} from "../services/contact.service";
 import { validationResult } from "express-validator";
 import log from "../utils/logger";
-import mongoose from "mongoose";
 
 export async function createContactHandler(req: Request, res: Response) {
   const userId = res.locals.user._id;
@@ -26,13 +29,43 @@ export async function createContactHandler(req: Request, res: Response) {
 }
 
 export async function getContactInfoHandler(req: Request, res: Response) {
-  const userId = res.locals.user._id;
+  const contactId = req.params.contactId;
 
-  const contact = await findContact({ userId });
+  const contact = await findContact({ contactId });
 
   if (!contact) {
     return res.sendStatus(404);
   }
 
   return res.send(contact);
+}
+
+export async function updateContactInfoHandler(req: Request, res: Response) {
+  const userId = res.locals.user._id;
+
+  const errors = validationResult(req);
+
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
+  const contactId = req.params.contactId;
+
+  const contact = await findContact({ contactId });
+
+  if (!contact) {
+    return res.sendStatus(404);
+  }
+
+  const update = { ...contact, participantId: req.params.participantId };
+
+  if (String(contact.user) !== userId) {
+    return res.sendStatus(403);
+  }
+
+  const updateContact = await findAndUpdateContact({ contactId }, update, {
+    new: true,
+  });
+
+  return res.send(updateContact);
 }
