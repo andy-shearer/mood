@@ -67,7 +67,7 @@ export async function googleOauthHandler(req: Request, res: Response) {
     // create an access token
     const accessToken = signJwt(
       {
-        ...user.toJSON(),
+        ...user,
         session: session._id,
       },
       {
@@ -78,7 +78,7 @@ export async function googleOauthHandler(req: Request, res: Response) {
     //   create a refresh token
     const refreshToken = signJwt(
       {
-        ...user.toJSON(),
+        ...user,
         session: session._id,
       },
       {

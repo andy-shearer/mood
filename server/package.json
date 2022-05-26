@@ -6,7 +6,7 @@
   "author": "Ernest",
   "license": "MIT",
   "scripts": {
-    "dev": "ts-node-dev --respawn --transpile-only src/app.ts",
+    "start": "node build/src/app.js",
     "postinstall": "tsc"
   },
   "dependencies": {
@@ -26,6 +26,7 @@
     "nanoid": "^3.3.4",
     "pino": "^7.11.0",
     "pino-pretty": "^7.6.1",
+    "ts-node": "^10.8.0",
     "twilio": "^3.77.1",
     "zod": "^3.14.4"
   },

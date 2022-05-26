@@ -4,7 +4,7 @@ import {
   getContactInfoHandler,
   updateContactInfoHandler,
 } from "./controllers/contact.controller";
-import { check } from "express-validator/check";
+import { check } from "express-validator";
 import { checkSchema } from "express-validator";
 import { googleOauthHandler } from "./controllers/session.controller";
 import { webhookHandler } from "./controllers/webhook.controller";
