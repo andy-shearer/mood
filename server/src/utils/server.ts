@@ -1,4 +1,5 @@
 import express from "express";
+import path from "path";
 import deserializeUser from "../middleware/deserializeUser";
 import routes from "../routes";
 
