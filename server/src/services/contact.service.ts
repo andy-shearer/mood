@@ -1,4 +1,4 @@
-import { FilterQuery, QueryOptions } from "mongoose";
+import { FilterQuery, QueryOptions, UpdateQuery } from "mongoose";
 import ContactModel, {
   ContactDocument,
   ContactInput,
@@ -15,4 +15,12 @@ export async function findContact(
   options: QueryOptions = { lean: true }
 ) {
   return ContactModel.findOne(query, {}, options);
+}
+
+export async function findAndUpdateContact(
+  query: FilterQuery<ContactDocument>,
+  update: UpdateQuery<ContactDocument>,
+  options: QueryOptions
+) {
+  return ContactModel.findOneAndUpdate(query, update, options);
 }
