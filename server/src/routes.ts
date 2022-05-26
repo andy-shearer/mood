@@ -2,8 +2,10 @@ import { Response, Request, Express } from "express";
 import {
   createContactHandler,
   getContactInfoHandler,
+  updateContactInfoHandler,
 } from "./controllers/contact.controller";
-import { body, check } from "express-validator";
+import { check } from "express-validator/check";
+import { checkSchema } from "express-validator";
 import { googleOauthHandler } from "./controllers/session.controller";
 import { webhookHandler } from "./controllers/webhook.controller";
 
@@ -21,13 +23,19 @@ function routes(app: Express) {
   // Create user contact details
   app.post(
     "/api/contact",
-    [requireUser, check("mobile").exists(), check("social").exists()],
+    [requireUser, check("mobile").exists()],
     createContactHandler
   );
 
   // Get user contact details
-  app.get("/api/contact", requireUser, getContactInfoHandler);
+  app.get("/api/contact/:contactId", requireUser, getContactInfoHandler);
 
+  // Update user contact details
+  app.put(
+    "/api/contact/:contactId/:participantId",
+    [requireUser, check("mobile").exists()],
+    updateContactInfoHandler
+  );
   // Webhook handler for SMS events
   app.get("/webhook", webhookHandler);
 }
