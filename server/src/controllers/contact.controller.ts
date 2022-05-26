@@ -6,6 +6,7 @@ import {
 } from "../services/contact.service";
 import { validationResult } from "express-validator";
 import log from "../utils/logger";
+import SMSHandler from "../scripts/SMSHandler.js";
 
 export async function createContactHandler(req: Request, res: Response) {
   const userId = res.locals.user._id;
@@ -16,9 +17,11 @@ export async function createContactHandler(req: Request, res: Response) {
     return res.status(400).json({ errors: errors.array() });
   }
   try {
+    const participantSID = await SMSHandler.createConversationForUser(body.mobile);
     const contact = await createContact({
       ...body,
       user: userId,
+      participantId: participantSID
     });
 
     return res.send(contact);

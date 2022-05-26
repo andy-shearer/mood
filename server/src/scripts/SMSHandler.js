@@ -1,8 +1,10 @@
 require("dotenv").config();
-const acctSid = process.env.TWILIO_ACCOUNT_SID;
 const authToken = process.env.TWILIO_AUTH_TOKEN;
 const senderNo = process.env.SENDER_NUMBER;
+const acctSid = process.env.TWILIO_ACCOUNT_SID;
 const client = require('twilio')(acctSid, authToken);
+const phoneUtil = require('google-libphonenumber').phoneUtil;
+const PNF = require('google-libphonenumber').PhoneNumberFormat;
 
 /**
  * Performs a lookup of the ConversationParticipant resources that are associated with
@@ -31,8 +33,6 @@ async function getConversationSID(participantSid) {
       return c.sid;
     }
   }
-
-  // TODO: If we don't have a ConversationSID for this participant, create one and add them as a ConversationParticipant
 }
 
 /**
@@ -40,6 +40,14 @@ async function getConversationSID(participantSid) {
  * Returns the ConversationParticipantSID to be used in future calls.
  */
 async function createConversationForUser(userPhoneNumber) {
+  const tel = phoneUtil.parse(userPhoneNumber);
+  const targetNumber = phoneUtil.format(tel, PNF.E164); // Normalise the format of the number to include the country code
+  // Return the conversation for this phone number if it already exists
+  const existing = await getConversationParticipantSid(targetNumber);
+  if(existing) {
+    return existing;
+  }
+
   const conversation = await client.conversations.conversations
     .create({
        friendlyName: 'Mood Conversation'
@@ -48,12 +56,30 @@ async function createConversationForUser(userPhoneNumber) {
   const participant = await client.conversations.conversations(conversation.sid)
     .participants
     .create({
-       'messagingBinding.address': userPhoneNumber,
+       'messagingBinding.address': targetNumber,
        'messagingBinding.proxyAddress': senderNo
      });
 
 // ConversationParticipant UUID (UserSID)
    return participant.sid;
+}
+
+async function getConversationParticipantSid(userPhoneNumber) {
+  const allConversations = await client.conversations.conversations
+    .list();
+
+  console.log(allConversations.length);
+  for(let i=0; i<allConversations.length; i++) {
+    const c = allConversations[i];
+    const convParticipants = await getChatParticipants(c.sid);
+    const targetParticipant = convParticipants.find(participant => {
+      console.log(participant.messagingBinding.address, userPhoneNumber);
+      return (participant.messagingBinding && participant.messagingBinding.address === userPhoneNumber);
+    });
+    if(targetParticipant) {
+      return targetParticipant.sid;
+    }
+  }
 }
 
 /**
