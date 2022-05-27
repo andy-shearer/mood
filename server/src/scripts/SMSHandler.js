@@ -1,7 +1,7 @@
 require("dotenv").config();
-const acctSid = process.env.TWILIO_ACCOUNT_SID;
 const authToken = process.env.TWILIO_AUTH_TOKEN;
 const senderNo = process.env.SENDER_NUMBER;
+const acctSid = process.env.TWILIO_ACCOUNT_SID;
 const client = require('twilio')(acctSid, authToken);
 
 /**
@@ -31,8 +31,6 @@ async function getConversationSID(participantSid) {
       return c.sid;
     }
   }
-
-  // TODO: If we don't have a ConversationSID for this participant, create one and add them as a ConversationParticipant
 }
 
 /**
@@ -40,6 +38,13 @@ async function getConversationSID(participantSid) {
  * Returns the ConversationParticipantSID to be used in future calls.
  */
 async function createConversationForUser(userPhoneNumber) {
+  const targetNumber = userPhoneNumber.replace(/\s+/g, ''); // Remove any whitespace from the phone number
+  // Return the conversation for this phone number if it already exists
+  const existing = await getConversationParticipantSid(targetNumber);
+  if(existing) {
+    return existing;
+  }
+
   const conversation = await client.conversations.conversations
     .create({
        friendlyName: 'Mood Conversation'
@@ -48,12 +53,32 @@ async function createConversationForUser(userPhoneNumber) {
   const participant = await client.conversations.conversations(conversation.sid)
     .participants
     .create({
-       'messagingBinding.address': userPhoneNumber,
+       'messagingBinding.address': targetNumber,
        'messagingBinding.proxyAddress': senderNo
      });
 
 // ConversationParticipant UUID (UserSID)
    return participant.sid;
+}
+
+async function getConversationParticipantSid(userPhoneNumber) {
+  const allConversations = await client.conversations.conversations
+    .list();
+
+  for(let i=0; i<allConversations.length; i++) {
+    const c = allConversations[i];
+    const convParticipants = await getChatParticipants(c.sid);
+    const targetParticipant = convParticipants.find(participant => {
+      if(!participant.messagingBinding) {
+        return false;
+      }
+      const participantNumber = participant.messagingBinding.address.replace(/\s+/g, ''); // Remove any whitespace before matching
+      return (participantNumber === userPhoneNumber);
+    });
+    if(targetParticipant) {
+      return targetParticipant.sid;
+    }
+  }
 }
 
 /**

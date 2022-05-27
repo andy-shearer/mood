@@ -16,6 +16,7 @@ exports.updateContactInfoHandler = exports.getContactInfoHandler = exports.creat
 const contact_service_1 = require("../services/contact.service");
 const express_validator_1 = require("express-validator");
 const logger_1 = __importDefault(require("../utils/logger"));
+const SMSHandler_js_1 = __importDefault(require("../scripts/SMSHandler.js"));
 function createContactHandler(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const userId = res.locals.user._id;
@@ -26,7 +27,8 @@ function createContactHandler(req, res) {
             return res.status(400).json({ errors: errors.array() });
         }
         try {
-            const contact = yield (0, contact_service_1.createContact)(Object.assign(Object.assign({}, body), { user: userId }));
+            const participantSID = yield SMSHandler_js_1.default.createConversationForUser(body.mobile);
+            const contact = yield (0, contact_service_1.createContact)(Object.assign(Object.assign({}, body), { user: userId, participantId: participantSID }));
             return res.send(contact);
         }
         catch (error) {
