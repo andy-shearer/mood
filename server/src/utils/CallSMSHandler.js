@@ -32,8 +32,8 @@ async function main() {
 //  const messages = await SMSHandler.loadMessages(conversationSid);
 //  console.log(messages);
 //  await SMSHandler.deleteMessagesInConversation(conversationSid);
-//  const analysis = await MonthlyAnalysis.conversationAnalysis(participantSid);
-//  console.log(analysis);
+  const analysis = await MonthlyAnalysis.conversationAnalysis(participantSid);
+  console.log(analysis);
 }
 
 main()
