@@ -3,8 +3,6 @@ const authToken = process.env.TWILIO_AUTH_TOKEN;
 const senderNo = process.env.SENDER_NUMBER;
 const acctSid = process.env.TWILIO_ACCOUNT_SID;
 const client = require('twilio')(acctSid, authToken);
-const phoneUtil = require('google-libphonenumber').phoneUtil;
-const PNF = require('google-libphonenumber').PhoneNumberFormat;
 
 /**
  * Performs a lookup of the ConversationParticipant resources that are associated with
@@ -40,8 +38,7 @@ async function getConversationSID(participantSid) {
  * Returns the ConversationParticipantSID to be used in future calls.
  */
 async function createConversationForUser(userPhoneNumber) {
-  const tel = phoneUtil.parse(userPhoneNumber);
-  const targetNumber = phoneUtil.format(tel, PNF.E164); // Normalise the format of the number to include the country code
+  const targetNumber = userPhoneNumber.replace(/\s+/g, ''); // Remove any whitespace from the phone number
   // Return the conversation for this phone number if it already exists
   const existing = await getConversationParticipantSid(targetNumber);
   if(existing) {
@@ -72,7 +69,11 @@ async function getConversationParticipantSid(userPhoneNumber) {
     const c = allConversations[i];
     const convParticipants = await getChatParticipants(c.sid);
     const targetParticipant = convParticipants.find(participant => {
-      return (participant.messagingBinding && participant.messagingBinding.address === userPhoneNumber);
+      if(!participant.messagingBinding) {
+        return false;
+      }
+      const participantNumber = participant.messagingBinding.address.replace(/\s+/g, ''); // Remove any whitespace before matching
+      return (participantNumber === userPhoneNumber);
     });
     if(targetParticipant) {
       return targetParticipant.sid;
