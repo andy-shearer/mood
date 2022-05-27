@@ -3,6 +3,7 @@ import log from "../utils/logger";
 
 export async function webhookHandler(req: Request, res: Response) {
   // TODO: Authenticate 'X-Twilio-Signature' header
+  // TODO: Handle Opt-Outs https://www.twilio.com/docs/messaging/services/tutorials/advanced-opt-out#keeping-track-of-your-users-status
   const query = req.query;
   if (query.EventType === "onMessageAdded") {
     log.info("RECEIVED INBOUND MESSAGE from " + query.Author);

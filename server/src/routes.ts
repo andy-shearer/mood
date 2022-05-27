@@ -8,6 +8,7 @@ import { check } from "express-validator";
 import { checkSchema } from "express-validator";
 import { googleOauthHandler } from "./controllers/session.controller";
 import { webhookHandler } from "./controllers/webhook.controller";
+import { scheduledSendHandler } from "./controllers/schedule.controller";
 
 import requireUser from "./middleware/requireUser";
 
@@ -36,8 +37,12 @@ function routes(app: Express) {
     [requireUser, check("mobile").exists()],
     updateContactInfoHandler
   );
+
   // Webhook handler for SMS events
   app.get("/webhook", webhookHandler);
+
+  // Send messages to users on a schedule
+  app.get("/scheduledSend", scheduledSendHandler);
 }
 
 export default routes;

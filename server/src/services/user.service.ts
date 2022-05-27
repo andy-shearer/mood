@@ -94,4 +94,15 @@ export async function findAndUpdateUser(
 ) {
   return UserModel.findOneAndUpdate(query, update, options);
 }
+
+export async function getAllUsers(callback) {
+  UserModel.find(function (err, results) {
+    if(err) {
+      log.error(err, "Error fetching all users");
+    }
+
+    // Invoke callback with the returned results
+    callback(results);
+  });
+};
 //
