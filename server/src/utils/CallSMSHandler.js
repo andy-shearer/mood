@@ -24,10 +24,6 @@ async function main() {
 //    getMsg()
 //  );
 
-  const newSid = await SMSHandler.createConversationForUser("07432561676");
-  console.log("Existing SID", participantSid);
-  console.log("New SID", newSid);
-
   //const conversationSid = await SMSHandler.getConversationSID(participantSid);
 //  const messages = await SMSHandler.loadMessages(conversationSid);
 //  console.log(messages);
